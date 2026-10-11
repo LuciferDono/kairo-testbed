@@ -1,0 +1,22 @@
+name: Preview deploy
+
+# Deploys a preview environment for pull requests labelled needs-preview.
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+jobs:
+  preview:
+    if: contains(github.event.pull_request.labels.*.name, 'needs-preview')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy preview
+        env:
+          PREVIEW_TOKEN: ${{ secrets.PREVIEW_TOKEN }}
+        run: |
+          if [ -z "$PREVIEW_TOKEN" ]; then
+            echo "::error::PREVIEW_TOKEN is unavailable; cannot deploy the preview environment."
+            exit 1
+          fi
+          echo "deploying preview"
