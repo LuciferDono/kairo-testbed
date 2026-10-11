@@ -1,57 +1,29 @@
-export type Zone = "domestic" | "canada" | "europe" | "asia" | "rest";
-
-const ZONES: Record<string, Zone> = {
-  US: "domestic",
-  CA: "canada",
-  GB: "europe",
-  DE: "europe",
-  FR: "europe",
-  ES: "europe",
-  IN: "asia",
-  JP: "asia",
-  SG: "asia",
-};
-
-const BASE: Record<Zone, number> = { domestic: 4.5, canada: 8, europe: 12, asia: 14, rest: 20 };
-
-export function zoneFor(country: string): Zone {
-  return ZONES[country.toUpperCase()] ?? "rest";
+export interface ShippingRate {
+  carrier: string;
+  service: string;
+  days: number;
+  rateUsd: number;
 }
 
-export function baseRate(zone: Zone, weightKg: number): number {
-  if (weightKg <= 0) throw new Error("weight must be positive");
-  let rate = BASE[zone];
-  if (weightKg > 1) rate += (Math.min(weightKg, 5) - 1) * 1.5;
-  if (weightKg > 5) rate += (Math.min(weightKg, 20) - 5) * 1.1;
-  if (weightKg > 20) rate += (weightKg - 20) * 2.2;
-  return Math.round(rate * 100) / 100;
-}
+const CARRIERS: Array<{ carrier: string; service: string; days: number; base: number }> = [
+  { carrier: "usps", service: "USPS Priority Mail", days: 3, base: 5.2 },
+  { carrier: "fedex", service: "FedEx Ground", days: 2, base: 7.9 },
+  { carrier: "ups", service: "UPS Ground", days: 2, base: 8.5 },
+];
 
-export function fuelSurcharge(zone: Zone): number {
-  switch (zone) {
-    case "domestic":
-      return 0.04;
-    case "canada":
-      return 0.06;
-    case "europe":
-      return 0.08;
-    case "asia":
-      return 0.09;
-    default:
-      return 0.12;
+export function quoteRates(weightLb: number): ShippingRate[] {
+  if (weightLb <= 0) {
+    throw new RangeError("weightLb must be greater than 0");
   }
+  return CARRIERS.map(({ carrier, service, days, base }) => ({
+    carrier,
+    service,
+    days,
+    rateUsd: base + weightLb * 0.5,
+  }));
 }
 
-export function isRemote(postcode: string): boolean {
-  const code = postcode.trim().toUpperCase();
-  if (code.length < 3) return false;
-  return code.startsWith("99") || code.startsWith("IV") || code.startsWith("HS");
-}
-
-export function quote(country: string, postcode: string, weightKg: number): number {
-  const zone = zoneFor(country);
-  const base = baseRate(zone, weightKg);
-  const withFuel = base * (1 + fuelSurcharge(zone));
-  const remote = isRemote(postcode) ? 6.5 : 0;
-  return Math.round((withFuel + remote) * 100) / 100;
+export function cheapestRate(weightLb: number): ShippingRate {
+  const rates = quoteRates(weightLb);
+  return rates.reduce((best, current) => (current.rateUsd < best.rateUsd ? current : best));
 }
