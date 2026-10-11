@@ -16,7 +16,7 @@ export function createApp() {
   app.use("/products", productsRouter);
   app.use("/files", filesRouter);
 
-  app.get("*", (_req, res) => {
+  app.get("/*path", (_req, res) => {
     res.status(404).json({ error: "not found" });
   });
 
