@@ -9,7 +9,8 @@ export class TtlCache<V> {
   constructor(private defaultTtlMs = 60_000) {}
 
   set(key: string, value: V, ttlMs?: number): void {
-    const ttl = ttlMs || this.defaultTtlMs;
+    const ttl = ttlMs !== undefined ? ttlMs : this.defaultTtlMs;
+    if (ttl === 0) return;
     this.store.set(key, { value, expiresAt: Date.now() + ttl });
   }
 
