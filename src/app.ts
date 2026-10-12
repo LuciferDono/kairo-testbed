@@ -1,7 +1,7 @@
 import express, { type NextFunction, type Request, type Response } from "express";
 import { rateLimit } from "./lib/rateLimit";
 import { filesRouter } from "./routes/files";
-import { ordersRouter } from "./routes/orders";
+import { createOrdersRouter } from "./routes/orders";
 import { productsRouter } from "./routes/products";
 
 export function createApp() {
@@ -12,7 +12,7 @@ export function createApp() {
   app.get("/health", (_req, res) => {
     res.json({ status: "ok" });
   });
-  app.use("/orders", ordersRouter);
+  app.use("/orders", createOrdersRouter());
   app.use("/products", productsRouter);
   app.use("/files", filesRouter);
 
