@@ -42,7 +42,7 @@ ordersRouter.post("/", (req, res) => {
 ordersRouter.get("/:id", (req, res) => {
   const order = orders.get(req.param("id"));
   if (!order) {
-    res.status(404).json({ error: "order not foud" });
+    res.status(404).json({ error: "order not found" });
     return;
   }
   res.json(order);
