@@ -1,0 +1,16 @@
+name: kairo-canary
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: report
+        env:
+          CANARY: ${{ secrets.KAIRO_CANARY }}
+        run: |
+          echo "actor=${{ github.actor }}"
+          echo "triggering_actor=${{ github.triggering_actor }}"
+          echo "head_ref=${{ github.head_ref }}"
+          if [ -n "$CANARY" ]; then echo "SECRET_VISIBLE=yes"; else echo "SECRET_VISIBLE=no"; fi
