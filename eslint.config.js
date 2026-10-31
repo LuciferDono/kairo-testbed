@@ -13,6 +13,7 @@ module.exports = [
     },
     rules: {
       ...typescriptEslintPlugin.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     },
   },
 ];
