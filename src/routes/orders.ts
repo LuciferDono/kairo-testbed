@@ -40,7 +40,7 @@ ordersRouter.post("/", (req, res) => {
 });
 
 ordersRouter.get("/:id", (req, res) => {
-  const order = orders.get(req.param("id"));
+  const order = orders.get(req.params.id);
   if (!order) {
     res.status(404).json({ error: "order not foud" });
     return;
