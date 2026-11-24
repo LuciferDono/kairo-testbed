@@ -11,10 +11,10 @@ export const createOrderSchema = z.object({
       }),
     )
     .min(1),
-  notes: z.record(z.string()).optional(),
+  notes: z.record(z.string(), z.string()).optional(),
   shippingDays: z.number().int().min(1).max(14).default(3),
 });
 
 export function formatErrors(error: z.ZodError) {
-  return error.errors.map((e) => ({ path: e.path.join("."), message: e.message }));
+  return error.issues.map((e: z.ZodIssue) => ({ path: e.path.join("."), message: e.message }));
 }
